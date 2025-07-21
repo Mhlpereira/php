@@ -1,0 +1,15 @@
+{
+    "name": "mario/php",
+    "autoload": {
+        "psr-4": {
+            "Mario\\Php\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mario Henrique",
+            "email": "mariohenriquelp@gmail.com"
+        }
+    ],
+    "require": {}
+}
