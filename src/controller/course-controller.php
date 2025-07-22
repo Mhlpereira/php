@@ -9,6 +9,7 @@ use App\Service\TeamService;
 
 use App\Dto\CourseCreateDto;
 use App\Dto\TeamCreateDto;
+use App\Dto\TeamUpdateDto;
 
 class CourseController
 {
@@ -98,10 +99,17 @@ class CourseController
 
     public function updateTeam(Request $request, Response $response, array $args): Response
     {
-        $teamId = $args['id'];
-        $teamData = $request->getParsedBody();
-        
-        $updatedTeam = $this->teamService->updateTeam($teamId, $teamData);
+        $data  = $request->getParsedBody();
+        try{
+            $dto = new TeamUpdateDto(
+                $data['title'],
+                $data['description'],
+                $data['maxStudents'],
+                $data['status'],
+                $data['startingDate'],
+                $data['endingDate']
+            );
+        $updatedTeam = $this->teamService->updateTeam($dto);
         if (!$updatedTeam) {
             $response->getBody()->write("Erro ao atualizar equipe.");
             return $response->withStatus(500);
@@ -109,8 +117,11 @@ class CourseController
         
         $response->getBody()->write(json_encode($updatedTeam));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-    }
-
+    } catch (\InvalidArgumentException $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+}
     public function deleteTeam(Request $request, Response $response, array $args): Response
     {
         $grupoId = $args['grupoId'];

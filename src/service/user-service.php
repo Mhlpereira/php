@@ -3,13 +3,15 @@
 namespace App\Service;
 
 use App\Repository\UserRepository;
+use App\Service\TeamService;
 
 class UserService {
 
     private $userRepository;
 
-    public function __construct(UserRepository $userRepository) {
+    public function __construct(UserRepository $userRepository, TeamService $teamService) {
         $this->userRepository = $userRepository;
+        $this->teamService = $teamService;
     }
 
     public function createUser($data){
@@ -39,6 +41,17 @@ class UserService {
             return $this->userRepository->deleteUser($name);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function enroll($enrollDto): void {
+        try {
+            if (empty($enrollDto->getUserId()) || empty($enrollDto->getCourseId()) || empty($enrollDto->getTeamId())) {
+                throw new \InvalidArgumentException('User ID, Course ID, and Team ID are required');
+            }
+            $this->teamService->enrollUserInTeam($enrollDto);
+        } catch (\InvalidArgumentException $e) {
+            throw new \InvalidArgumentException($e->getMessage());
         }
     }
 }

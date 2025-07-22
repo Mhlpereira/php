@@ -32,9 +32,15 @@ class UserController
 
     public function deleteUser(Request $request, Response $response, array $args): Response
     {
-        $name = $args['name'];
-        $response->getBody()->write("Olá, " . htmlspecialchars($name));
-        return $response;
+        $userId = $args['id'];
+        try {
+            $result = $this->userService->deleteUser($userId);
+            $response->getBody()->write(json_encode($result));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Exception $e) {  
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
     }
 
     public function getAllCoursesMatriculated(Request $request, Response $response, array $args): Response
@@ -48,5 +54,23 @@ class UserController
         
         $response->getBody()->write(json_encode($courses));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    }
+
+    public function enroll(Request $request, Response $response, array $args): Response
+    {
+        $data = $request->getParsedBody();
+        try{
+            $dto = new EnrollDto(
+                $data['user_id'],
+                $data['course_id'],
+                $data['team_id']
+            );
+            $this->userService->enroll($dto);
+        $response->getBody()->write("Usuário {$userId} matriculado no curso {$courseId}");
+        return $response->withStatus(200);
+    }catch (\InvalidArgumentException $e) {
+        $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+    }
     }
 }

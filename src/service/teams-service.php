@@ -5,28 +5,138 @@ use App\Entities\Team;
 use App\Entities\User;
 
 use App\Repository\TeamRepository;
+use App\Dto\TeamCreateDto;
+use App\Dto\EnrollDto;
+use App\Service\CourseService;
+use App\Dto\TeamUpdateDto;
 
 class TeamsService
 {   
     private $teamRepository;
 
-    public function __construct(TeamRepository $teamRepository) {
+    public function __construct(TeamRepository $teamRepository, CourseService $courseService) {
         $this->teamRepository = $teamRepository;
+        $this->courseService = $courseService;
     }
 
-    public function addStudent(User $student): void
+    public function hasAvailableSpots(string $teamId, string $courseId): bool{
+        try{
+            $team = $this->teamRepository->getTeamById($teamId);
+            if ($team->getCourseId() !== $courseId) {
+                throw new \InvalidArgumentException('Team does not belong to the given course');
+            }
+            return count($team->getStudents()) < $team->getMaxStudents();
+        } catch (\Exception $e) {
+            throw new \Exception('Error checking available spots: ' . $e->getMessage());
+        }
+    }
+
+    public function enrollUserInTeam(EnrollDto $enrollDto): void
     {
-        if (empty($student->getName())) {
-            throw new \InvalidArgumentException('Student name is required');
+        if (empty($enrollDto->getUserId()) || empty($enrollDto->getCourseId()) || empty($enrollDto->getTeamId())) {
+            throw new \InvalidArgumentException('User ID, Course ID, and Team ID are required');
         }
-
-        if (count($this->students) >= $this->maxStudents) {
-            throw new \Exception("Não tem vagas disponíveis para mais alunos.");
+        $this->hasAvailableSpots($enrollDto->getTeamId(), $enrollDto->getCourseId());
+        if(!$this->hasAvailableSpots($enrollDto->getTeamId(), $enrollDto->getCourseId())){
+            throw new \Exception('No available spots in the team');
         }
-
-        $this->teamRepository->addStudent($student);
+        $this->teamRepository->enrollUserInTeam($enrollDto);
     }
 
+    public function getTeamById(string $teamId): Team
+    {
+        $team = $this->teamRepository->getTeamById($teamId);
+        if($team){
+            this->verifyTeamEndingDate($teamId);
+            this->verifyTeamCapacity($teamId);
+        }
+        if (!$team) {
+            throw new \InvalidArgumentException('Team not found');
+        }
+        return $team;
+    }
 
+    public function createTeam(TeamCreateDto $data): team{
+        try{
+        if (empty($data->getName()) || empty($data->getCourseId())) {
+            throw new \InvalidArgumentException('Team name and course ID are required');
+        }
+        if (!$this->courseService->getCourseById($data->getCourseId())) {
+            throw new \InvalidArgumentException('Course not found');
+        }
+        $team = $this->teamRepository->createTeam($data);
+        if (!$team) {
+            throw new \Exception('Error creating team');
+        }
+        return $team;
+        }catch (\Exception $e) {
+            throw new \Exception('Error creating team: ' . $e->getMessage());
+        }
+    }
 
+    public function updateTeam(TeamUpdateDto $data){
+        try{
+            $team = $this->getTeamById($data->getTeamId());
+            if (!$team) {
+                throw new \InvalidArgumentException('Team not found');
+            }
+            $updatedTeam = $this->teamRepository->updateTeam($team, $data);
+            if (!$updatedTeam) {
+                throw new \Exception('Error updating team');
+            }
+            return $updatedTeam;
+        } catch (\Exception $e) {
+            throw new \Exception('Error updating team: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteTeam(string $teamId): void
+    {
+        try {
+            $team = $this->getTeamById($teamId);
+            if (!$team) {
+                throw new \InvalidArgumentException('Team not found');
+            }
+            $this->teamRepository->deleteTeam($teamId);
+        } catch (\Exception $e) {
+            throw new \Exception('Error deleting team: ' . $e->getMessage());
+        }
+    }
+
+    private function closeTeam(string $teamId): void
+    {
+        try {
+            $team = $this->getTeamById($teamId);
+            if (!$team) {
+                throw new \InvalidArgumentException('Team not found');
+            }
+            $team->setStatus(TeamStatus::CLOSED);
+            $this->teamRepository->updateTeam($team);
+        } catch (\Exception $e) {
+            throw new \Exception('Error closing team: ' . $e->getMessage());
+        }
+    }
+    
+    private function verifyTeamEndingDate(string $teamId): void
+    {
+        try {
+            $currentDate = new \DateTime();
+            if ($team->getEndingDate() < $currentDate) {
+                $this->closeTeam($teamId);
+            }
+        } catch (\Exception $e) {
+            throw new \Exception('Error verifying team ending date: ' . $e->getMessage());
+        }
+    }
+
+    private function verifyTeamCapacity(string $teamId): void
+    {
+        try {
+            if (count($team->getStudents()) >= $team->getMaxStudents()) {
+                $this->closeTeam($teamId);
+            }
+        } catch (\Exception $e) {
+            throw new \Exception('Error verifying team capacity: ' . $e->getMessage());
+        }
+    }
 }

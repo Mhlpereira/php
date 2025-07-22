@@ -2,13 +2,27 @@
 
 namespace App\Service;
 
+use App\Repository\CourseRepository;
+use App\Dto\CourseCreateDto;
+use App\Service\TeamService;
+
 class CourseService {
-    public function getAllCourses() {
-        
+
+    private $courseRepository;
+
+    public function __construct(CourseRepository $courseRepository) {
+        $this->courseRepository = $courseRepository;
     }
 
-    public function getCourseById($id) {
-        // Logic to retrieve a specific course by ID
+    public function getAllCourses() {
+        try{
+            return $this->courseRepository->getAllCourses();
+        } catch (\Exception $e) {
+            throw new \Exception('Error retrieving courses: ' . $e->getMessage());
+        }
+    }
+
+    public function getAllAvailableCourses() {
     }
 
     public function createCourse($data) {
@@ -21,5 +35,17 @@ class CourseService {
 
     public function deleteCourse($id) {
         // Logic to delete a course
+    }
+
+    public function getCourseById($id) {
+        try{
+            $course = $this->courseRepository->getCourseById($id);
+            if (!$course) {
+                throw new \InvalidArgumentException('Course not found');
+            }
+            return $course;
+        } catch (\Exception $e) {
+            throw new \Exception('Error retrieving course: ' . $e->getMessage());
+        }
     }
 }
