@@ -1,10 +1,11 @@
 <?php
 namespace App\Entities;
 
+use App\Enums\TeamStatus;
 class Team{
 
     private string $id;
-    private Course $course;
+    private string $courseId;
     private string $title;
     private string $description;
     private int $maxStudents;
@@ -16,7 +17,7 @@ class Team{
     public function __construct(Course $course, string $title, string $description, int $maxStudents, TeamStatus $status, \DateTime $startingDate, \DateTime $endingDate)
     {
         $this->id = Uuid::uuid4()->toString();
-        $this->course = $course;
+        $this->courseId = $courseId;
         $this->title = $title;
         $this->description = $description;
         $this->maxStudents = $maxStudents;
@@ -25,9 +26,9 @@ class Team{
         $this->endingDate = $endingDate;
     }
 
-    public function getCourse(): Course
+    public function getCourse(): string
     {
-        return $this->course;
+        return $this->courseId;
     }
 
     public function getTitle(): string
@@ -61,7 +62,7 @@ class Team{
 
     public function setCourse(Course $course): void
     {
-        $this->course = $course;
+        $this->courseId = $courseId;
     }
 
     public function setTitle(string $title): void

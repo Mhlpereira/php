@@ -6,6 +6,6 @@ enum CourseCategory: string{
     case Inovation = "inovação";
     case Technology = "tecnologia";
     case Marketing = "marketing";
-    case entrepreneurship = "empreendedorismo";
+    case Entrepreneurship = "empreendedorismo";
     case Agriculture = "agro";
 }
