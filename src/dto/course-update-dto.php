@@ -4,27 +4,27 @@ namespace App\Dto;
 
 use App\Enums\CourseCategory;
 
-class CourseCreateDto {
+class CourseUpdateDto {
 
+    private string $id;
     private string $title;
     private string $description;
     private CourseCategory $category;
     private string $imageUrl;
 
-    public function __construct(string $title, string $description, CourseCategory $category, string $imageUrl) {
-        if (empty($title)) {
-            throw new \InvalidArgumentException('Title is required');
+    public function __construct(string $id, string $title, string $description, CourseCategory $category, string $imageUrl) {
+        if (empty($id)) {
+            throw new \InvalidArgumentException('ID is required');
         }
-        if (empty($category)) {
-            throw new \InvalidArgumentException('Category is required');
-        }
-        if (empty($imageUrl)) {
-            throw new \InvalidArgumentException('Image URL is required');
-        }
+        $this->id = $id;
         $this->title = $title;
         $this->description = $description;
         $this->category = $category;
         $this->imageUrl = $imageUrl;
+    }
+
+    public function getId(): string {
+        return $this->id;
     }
 
     public function getTitle(): string {
@@ -38,6 +38,7 @@ class CourseCreateDto {
     public function getCategory(): CourseCategory {
         return $this->category;
     }
+
     public function getImageUrl(): string {
         return $this->imageUrl;
     }

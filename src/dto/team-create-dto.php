@@ -48,4 +48,31 @@ class TeamCreateDto{
         $this->endingDate = $endingDate;
     }
 
+    public function getCourseId(): string {
+        return $this->courseId;
+    }
+
+    public function getTitle(): string {
+        return $this->title;
+    }  
+
+    public function getDescription(): string {
+        return $this->description;
+    }
+
+    public function getMaxStudents(): int {
+        return $this->maxStudents;
+    }
+
+    public function getStatus(): TeamStatus {
+        return $this->status;
+    }
+    public function getStartingDate(): \DateTime {
+        return $this->startingDate;
+    }
+
+    public function getEndingDate(): \DateTime {
+        return $this->endingDate;
+    }
+
 }

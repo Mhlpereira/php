@@ -22,4 +22,16 @@ class EnrollDto {
         $this->courseId = $courseId;
         $this->teamId = $teamId;
     }
+
+    public function getUserId(): string {
+        return $this->userId;
+    }  
+
+    public function getCourseId(): string {
+        return $this->courseId;
+    }  
+
+    public function getTeamId(): string {
+        return $this->teamId;
+    }   
 }
