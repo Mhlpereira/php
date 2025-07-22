@@ -1,12 +1,17 @@
+<?php
 namespace App\Entities;
+
+use Ramsey\Uuid\Uuid;
 
 class User{
 
+    private string $id;
     private string $name;
     private string $email;
 
     public function __construct(string $name, string $email)
     {
+        $this->id = Uuid::uuid4()->toString();
         $this->name = $name;
         $this->email = $email;
     }

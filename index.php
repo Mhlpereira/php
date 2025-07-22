@@ -5,18 +5,18 @@ use Slim\Factory\AppFactory;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+
+$container = new Container();
+AppFactory::setContainer($container);
+
 $app = AppFactory::create();
 
+$app->addBodyParsingMiddleware();
 
-$app->get('/', function (Request $request, Response $response) {
-    $response->getBody()->write("Olá, mundo!");
-    return $response;
-});
 
-$app->post('/hello/{name}', function (Request $request, Response $response, array $args) {
-    $name = $args['name'];
-    $response->getBody()->write("Olá, " . $name);
-    return $response;
-});
+// Carrega dependências e rotas
+(require __DIR__ . '/../src/config/dependencies.php')($container);
+(require __DIR__ . '/../src/routes/api.php')($app);
+
 
 $app->run();

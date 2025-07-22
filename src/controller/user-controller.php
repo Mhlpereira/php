@@ -1,3 +1,4 @@
+<?php
 namespace App\Controller;
 
 use Psr\Http\Message\ResponseInterface as Response;
@@ -25,5 +26,18 @@ class UserController
         $name = $args['name'];
         $response->getBody()->write("Olá, " . htmlspecialchars($name));
         return $response;
+    }
+
+    public function getAllCoursesMatriculated(Request $request, Response $response, array $args): Response
+    {   
+        $userId = $args['id'];
+        $courses = $this->userService->getAllCoursesMatriculated($userId);
+        if (empty($courses)) {
+            $response->getBody()->write("Nenhum curso matriculado encontrado.");
+            return $response->withStatus(404);
+        }
+        
+        $response->getBody()->write(json_encode($courses));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 }

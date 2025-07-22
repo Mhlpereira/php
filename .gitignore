@@ -32,3 +32,5 @@ phpstan.neon
 # Testes unitários (se não quiser versionar relatórios)
 /coverage/
 /tests/_output/
+
+/vendor/
