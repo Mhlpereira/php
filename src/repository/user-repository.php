@@ -24,7 +24,7 @@ class UserRepository {
         }
     }
     
-    public function getAllCoursesMatriculated($userId) {
+    public function getAllCoursesEnrolled($userId) {
         $stmt = $this->pdo->prepare("SELECT * FROM courses WHERE user_id = :user_id");
         $stmt->bindParam(':user_id', $userId);
         $stmt->execute();

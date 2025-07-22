@@ -19,30 +19,21 @@ class TeamsService
         $this->courseService = $courseService;
     }
 
-    public function hasAvailableSpots(string $teamId, string $courseId): bool{
-        try{
-            $team = $this->teamRepository->getTeamById($teamId);
-            if ($team->getCourseId() !== $courseId) {
-                throw new \InvalidArgumentException('Team does not belong to the given course');
-            }
-            return count($team->getStudents()) < $team->getMaxStudents();
-        } catch (\Exception $e) {
-            throw new \Exception('Error checking available spots: ' . $e->getMessage());
-        }
-    }
 
     public function enrollUserInTeam(EnrollDto $enrollDto): void
     {
         if (empty($enrollDto->getUserId()) || empty($enrollDto->getCourseId()) || empty($enrollDto->getTeamId())) {
             throw new \InvalidArgumentException('User ID, Course ID, and Team ID are required');
         }
-        $this->hasAvailableSpots($enrollDto->getTeamId(), $enrollDto->getCourseId());
-        if(!$this->hasAvailableSpots($enrollDto->getTeamId(), $enrollDto->getCourseId())){
-            throw new \Exception('No available spots in the team');
+        $team = $this->teamRepository->getTeamById($enrollDto->getTeamId());
+        if (!$team) {
+            throw new \InvalidArgumentException('Team not found');
+        }
+        if ($team->getStatus() === TeamStatus::CLOSED) {
+            throw new \InvalidArgumentException('Team is not available for enrollment');
         }
         $this->teamRepository->enrollUserInTeam($enrollDto);
     }
-
     public function getTeamById(string $teamId): Team
     {
         $team = $this->teamRepository->getTeamById($teamId);

@@ -41,9 +41,18 @@ class CourseController
 
     public function updateCourse(Request $request, Response $response, array $args): Response
     {
-        $courseId = $args['id'];
-        $courseData = $request->getParsedBody();
         
+        $data = $request->getParsedBody();
+        
+        try{
+
+            $dto = new CourseUpdateDto(
+                $args['id'],
+                $data['title'] ?? null,
+                $data['description'] ?? null,
+                $data['category'] ?? null,
+                $data['imageUrl'] ?? null
+            );
         $updatedCourse = $this->courseService->updateCourse($courseId, $courseData);
         if (!$updatedCourse) {
             $response->getBody()->write("Erro ao atualizar curso.");
@@ -52,6 +61,10 @@ class CourseController
         
         $response->getBody()->write(json_encode($updatedCourse));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    }catch (\InvalidArgumentException $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
     }
 
     public function deleteCourse(Request $request, Response $response, array $args): Response
@@ -75,12 +88,11 @@ class CourseController
         try{
         $dto = new TeamCreateDto(
             $data['courseId'],
-            $data['title'],
             $data['description'],
             $data['maxStudents'],
             $data['status'],
             $data['startingDate'],
-            $data['endingDate'],
+            $data['endingDate']
         );
         $team = $this->teamService->createTeam($dto);
         
@@ -102,12 +114,15 @@ class CourseController
         $data  = $request->getParsedBody();
         try{
             $dto = new TeamUpdateDto(
-                $data['title'],
-                $data['description'],
-                $data['maxStudents'],
-                $data['status'],
-                $data['startingDate'],
-                $data['endingDate']
+            $data['teamId'],
+            $data['courseId'],
+            $data['title'] ?? null,
+            $data['description'] ?? null,
+            $data['maxStudents'] ?? null,
+            $data['status'] ?? null,
+            $data['startingDate'] ?? null,
+            $data['endingDate'] ?? null,
+
             );
         $updatedTeam = $this->teamService->updateTeam($dto);
         if (!$updatedTeam) {

@@ -23,11 +23,16 @@ class UserService {
         }
     }
 
-    public function getAllCoursesMatriculated($userId) {
+    public function getAllCoursesEnrolled($userId) {
         try{
             if (empty($userId)) {
                 throw new \InvalidArgumentException('User ID is required');
             }
+            $enrolledCourses = $this->userRepository->getAllCoursesEnrolled($userId);
+            if (empty($enrolledCourses)) {
+                throw new \InvalidArgumentException('No courses found for this user');
+            }
+            return $enrolledCourses;
         } catch (\InvalidArgumentException $e) {
             throw new \InvalidArgumentException($e->getMessage());
         }

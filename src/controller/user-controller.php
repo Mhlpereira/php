@@ -43,10 +43,10 @@ class UserController
         }
     }
 
-    public function getAllCoursesMatriculated(Request $request, Response $response, array $args): Response
+    public function getAllCoursesEnrolled(Request $request, Response $response, array $args): Response
     {   
         $userId = $args['id'];
-        $courses = $this->userService->getAllCoursesMatriculated($userId);
+        $courses = $this->userService->getAllCoursesEnrolled($userId);
         if (empty($courses)) {
             $response->getBody()->write("Nenhum curso matriculado encontrado.");
             return $response->withStatus(404);
