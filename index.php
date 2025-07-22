@@ -13,6 +13,10 @@ $app = AppFactory::create();
 
 $app->addBodyParsingMiddleware();
 
+$dotenv = parse_ini_file(__DIR__ . '/.env');
+foreach ($dotenv as $key => $value) {
+    putenv("$key=$value");
+}
 
 // Carrega dependências e rotas
 (require __DIR__ . '/../src/config/dependencies.php')($container);
