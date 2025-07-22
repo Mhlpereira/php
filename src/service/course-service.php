@@ -4,7 +4,7 @@ namespace App\Service;
 
 class CourseService {
     public function getAllCourses() {
-        // Logic to retrieve all courses
+        
     }
 
     public function getCourseById($id) {
