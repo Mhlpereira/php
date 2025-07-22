@@ -7,19 +7,35 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Service\CourseService;
 use App\Service\TeamService;
 
+use App\Dto\CourseCreateDto;
+use App\Dto\TeamCreateDto;
+
 class CourseController
 {
     public function __construct(private CourseService $courseService, private TeamService $teamService){}
 
     public function createCourse(Request $request, Response $response): Response
     {   
-        $course = $this->courseService->createCourse($request->getParsedBody());
+        $data = $request->getParsedBody();
+        try{
+            $dto = new CourseCreateDto(
+                $data['title'],
+                $data['description'],
+                $data['category'],
+                $data['imageUrl']
+            );
+            
+        $course = $this->courseService->createCourse($dto);
         if (!$course) {
             $response->getBody()->write("Erro ao criar curso.");
             return $response->withStatus(500);
         }
         $response->getBody()->write(json_encode($course));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(201); 
+        } catch (\InvalidArgumentException $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
     }
 
     public function updateCourse(Request $request, Response $response, array $args): Response
@@ -52,9 +68,20 @@ class CourseController
 
     public function createTeam(Request $request, Response $response): Response
     {   
-        $courseId = $args['id'];
-        $teamData = $request->getParsedBody();
-        $team = $this->teamService->createTeam($teamData);
+
+        $data = $request->getParsedBody();
+
+        try{
+        $dto = new TeamCreateDto(
+            $data['courseId'],
+            $data['title'],
+            $data['description'],
+            $data['maxStudents'],
+            $data['status'],
+            $data['startingDate'],
+            $data['endingDate'],
+        );
+        $team = $this->teamService->createTeam($dto);
         
         if (!$team) {
             $response->getBody()->write("Erro ao criar equipe.");
@@ -63,6 +90,10 @@ class CourseController
         
         $response->getBody()->write(json_encode($team));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+        } catch (\InvalidArgumentException $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
     }
 
     public function updateTeam(Request $request, Response $response, array $args): Response

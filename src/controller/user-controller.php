@@ -5,6 +5,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 use App\Service\UserService;
+use App\Dto\UserCreateDto;
 
 class UserController
 {   
@@ -16,9 +17,17 @@ class UserController
     }
     
     public function createUser(Request $request, Response $response): Response
-    {
-        $response->getBody()->write("Olá, mundo!");
-        return $response;
+    {   
+        $data = $request->getParsedBody();
+        try {
+            $dto = new UserCreateDto($data['name'], $data['email']);
+            $result = $this->userService->createUser($dto);
+            $response->getBody()->write(json_encode($result));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+        } catch (\InvalidArgumentException $e) {
+            $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
     }
 
     public function deleteUser(Request $request, Response $response, array $args): Response
