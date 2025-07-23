@@ -16,6 +16,12 @@ class UserController
         $this->userService = $userService;
     }
     
+    /**
+     * @OA\Post(
+     *     path="/user",
+     *     @OA\Response(response="201", description="Criar usuário")
+     * )
+     */
     public function createUser(Request $request, Response $response): Response
     {   
         $data = $request->getParsedBody();
@@ -30,6 +36,13 @@ class UserController
         }
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/user/{id}",
+     *    @OA\Parameter(name="id", in="path", required=true, description="ID do usuário"),
+     *     @OA\Response(response="204", description="Deletar usuário")
+     * )
+     */
     public function deleteUser(Request $request, Response $response, array $args): Response
     {
         $userId = $args['id'];
@@ -43,6 +56,12 @@ class UserController
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/user/enroll",
+     *     @OA\Response(response="200", description="Buscar cursos matriculados")
+     * )
+     */
     public function getAllCoursesEnrolled(Request $request, Response $response, array $args): Response
     {   
         $userId = $args['id'];
@@ -56,6 +75,13 @@ class UserController
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/user/{id}/enroll",
+     *    @OA\Parameter(name="id", in="path", required=true, description="ID do usuário"),
+     *     @OA\Response(response="200", description="Matricular usuário em curso")
+     * )
+     */
     public function enroll(Request $request, Response $response, array $args): Response
     {
         $data = $request->getParsedBody();

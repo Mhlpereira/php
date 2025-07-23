@@ -1,4 +1,11 @@
 <?php
+/**
+ * @OA\Info(
+ *     title="API de cursos",
+ *     version="1.0.0"
+ * )
+*/
+
 namespace App\Controller;
 
 use Psr\Http\Message\ResponseInterface as Response;
@@ -14,7 +21,13 @@ use App\Dto\TeamUpdateDto;
 class CourseController
 {
     public function __construct(private CourseService $courseService, private TeamService $teamService){}
-
+    
+    /**
+     * @OA\Post(
+     *     path="/courses",
+     *     @OA\Response(response="201", description="Criar curso")
+     * )
+     */
     public function createCourse(Request $request, Response $response): Response
     {   
         $data = $request->getParsedBody();
@@ -39,6 +52,14 @@ class CourseController
         }
     }
 
+
+    /**
+     * @OA\Put(
+     *     path="/courses/{id}",
+     *    @OA\Parameter(name="id", in="path", required=true, description="ID do curso"),
+     *     @OA\Response(response="200", description="Atualizar curso")
+     * )
+     */
     public function updateCourse(Request $request, Response $response, array $args): Response
     {
         
@@ -67,6 +88,13 @@ class CourseController
         }
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/courses/{id}",
+     *    @OA\Parameter(name="id", in="path", required=true, description="ID do curso"),
+     *     @OA\Response(response="200", description="Deletar curso")
+     * )
+     */
     public function deleteCourse(Request $request, Response $response, array $args): Response
     {
         $courseId = $args['id'];
@@ -80,6 +108,14 @@ class CourseController
         return $response->withStatus(200);
     }
 
+
+    /**
+     * @OA\Post(
+     *     path="/courses/teams",
+     *     @OA\Parameter(name="courseId", in="query", required=true, description="ID do curso"),
+     *     @OA\Response(response="201", description="Criar turma")
+     * )
+     */
     public function createTeam(Request $request, Response $response): Response
     {   
 
@@ -109,6 +145,13 @@ class CourseController
         }
     }
 
+    /**
+     * @OA\Put(
+     *     path="/courses/teams/{id}",
+     *     @OA\Parameter(name="id", in="path", required=true, description="ID da equipe"),
+     *     @OA\Response(response="200", description="Atualizar curso")
+     * )
+     */
     public function updateTeam(Request $request, Response $response, array $args): Response
     {
         $data  = $request->getParsedBody();
@@ -137,6 +180,14 @@ class CourseController
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 }
+
+    /**
+     * @OA\Delete(
+     *     path="/courses/teams/{id}",
+     *     @OA\Parameter(name="id", in="path", required=true, description="ID da equipe"),
+     *     @OA\Response(response="204", description="Curso deletado com sucesso")
+     * )
+     */
     public function deleteTeam(Request $request, Response $response, array $args): Response
     {
         $grupoId = $args['grupoId'];
@@ -151,6 +202,12 @@ class CourseController
         return $response->withStatus(200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/courses/teams/available",
+     *     @OA\Response(response="200", description="success")
+     * )
+     */
     public function getCourseWithAvailableTeams(Request $request, Response $response, array $args): Response
     {        
         $filters = $request->getQueryParams(); 

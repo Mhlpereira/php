@@ -20,7 +20,7 @@ foreach ($dotenv as $key => $value) {
 
 // Carrega dependências e rotas
 (require __DIR__ . '/../src/config/dependencies.php')($container);
-(require __DIR__ . '/../src/routes/api.php')($app);
+(require __DIR__ . '/../src/routes/routes.php')($app);
 
 
 $app->run();
