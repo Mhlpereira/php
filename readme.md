@@ -1,1 +1,11 @@
-colocar as validações quando lotar a turma mudar para closed e colocar também com o tempo
+# CRUD em PHP
+
+Crud básico em php para conhecer a linguagem. 
+
+## Tech Stack
+
+ - php 8+
+ - Slim Framework
+ - Docker
+ - Composer
+
